@@ -2,7 +2,7 @@ package fr.pgah;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -24,6 +24,7 @@ public class Intro extends ApplicationAdapter {
   int largeurFenetre; // la largeur de la fenêtre
   int[] aleatoire;
   int nbSprites;
+  Texture perdu;
 
   // Définition de la méthode create
   // C'est là qu'on initialise toutes les variables (on leur donne une valeur).
@@ -36,7 +37,7 @@ public class Intro extends ApplicationAdapter {
 
     imgs = new Texture[30]; // tableau = type objet aussi ; ici : 2 Textures
 
-    nbSprites = 1;
+    nbSprites = 2;
 
     aleatoire = new int[nbSprites] ;
     for (int i=0; i<nbSprites; i++){
@@ -48,7 +49,8 @@ public class Intro extends ApplicationAdapter {
     // Accès au 1er élément (notation indexée[])
     // Les tableaux sont indexés à partir de 0
     // On instancie (new) une nouvelle texture à chaque fois
-    for (int i=0; i<nbSprites; i++){
+    imgs[0] = new Texture("eddie.png");
+    for (int i=1; i<nbSprites; i++){
       imgs[i] = new Texture("bomb.png");
     }
 
@@ -127,7 +129,8 @@ public class Intro extends ApplicationAdapter {
     reinitialiserArrierePlan();
     testerBordures();
     deplacement();
-    // majCoordonnees();
+    collision();
+    majCoordonnees();
     dessiner();
 
     // Notez comme le fait d'avoir décomposé la méthode en plusieurs autres méthodes
@@ -135,18 +138,43 @@ public class Intro extends ApplicationAdapter {
 
   }
 
+  private void collision() {
+    for (int i = 1; i < nbSprites; i++) {
+      // Si le sprite tape en haut...
+      if (coordonneesY[0] == coordonneesY[i] + hauteursImgs[i]) {
+        batch.end();
+        
+      }
+
+      // Si le sprite tape en bas...
+      if (coordonneesY[0] + hauteursImgs[0] == coordonneesY[i]){
+        batch.end();
+      }
+
+      // Si le sprite tape à droite...
+      if (coordonneesX[0] == coordonneesX[i] + largeursImgs[i]) {
+        batch.end();
+      }
+
+      // Si le sprite tape à gauche...
+      if (coordonneesX[0] + largeursImgs[0] == coordonneesX[i]) {
+        batch.end();
+      }
+    }
+  }
+
   private void deplacement() {
-    if (Gdx.input.isKeyPressed(Buttons.LEFT)){ // Left, Right, Up, Down,
-        coordonneesX[0] -=1;
+    if (Gdx.input.isKeyPressed(Keys.LEFT)){
+        coordonneesX[0] -=5;
     }
-    else if (Gdx.input.isKeyPressed(Buttons.RIGHT)){
-      coordonneesX[0] +=1;
+    else if (Gdx.input.isKeyPressed(Keys.RIGHT)){
+      coordonneesX[0] +=5;
     }
-    else if (Gdx.input.isKeyPressed(Buttons.FORWARD)){
-      coordonneesY[0] +=1;
+    else if (Gdx.input.isKeyPressed(Keys.UP)){
+      coordonneesY[0] +=5;
     }
-    else if (Gdx.input.isKeyPressed(Buttons.BACK)){
-      coordonneesY[0] -=1;
+    else if (Gdx.input.isKeyPressed(Keys.DOWN)){
+      coordonneesY[0] -=5;
     }
 
   }
@@ -210,7 +238,7 @@ public class Intro extends ApplicationAdapter {
 
 
     // Pour tous les indices de 0 à 1, faire...
-    for (int i = 0; i < nbSprites; i++) {
+    for (int i = 1; i < nbSprites; i++) {
       // Si le sprite i va vers la droite
       if (versLaDroite[i]) {
         // on augmente X
@@ -224,7 +252,7 @@ public class Intro extends ApplicationAdapter {
     // MAJ coordonnées en Y
 
     // Pour tous les indices de 0 à 1, faire...
-    for (int i = 0; i < nbSprites; i++) {
+    for (int i = 1; i < nbSprites; i++) {
       // Si le sprite i va vers le haut
       if (versLeHaut[i]) {
         // on augmente Y

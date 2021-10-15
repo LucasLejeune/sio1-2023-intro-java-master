@@ -2,6 +2,7 @@ package fr.pgah;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -35,7 +36,7 @@ public class Intro extends ApplicationAdapter {
 
     imgs = new Texture[30]; // tableau = type objet aussi ; ici : 2 Textures
 
-    nbSprites = 30;
+    nbSprites = 1;
 
     aleatoire = new int[nbSprites] ;
     for (int i=0; i<nbSprites; i++){
@@ -125,11 +126,28 @@ public class Intro extends ApplicationAdapter {
 
     reinitialiserArrierePlan();
     testerBordures();
-    majCoordonnees();
+    deplacement();
+    // majCoordonnees();
     dessiner();
 
     // Notez comme le fait d'avoir décomposé la méthode en plusieurs autres méthodes
     // améliore la clarté et la concision de cette méhode
+
+  }
+
+  private void deplacement() {
+    if (Gdx.input.isKeyPressed(Buttons.LEFT)){ // Left, Right, Up, Down,
+        coordonneesX[0] -=1;
+    }
+    else if (Gdx.input.isKeyPressed(Buttons.RIGHT)){
+      coordonneesX[0] +=1;
+    }
+    else if (Gdx.input.isKeyPressed(Buttons.FORWARD)){
+      coordonneesY[0] +=1;
+    }
+    else if (Gdx.input.isKeyPressed(Buttons.BACK)){
+      coordonneesY[0] -=1;
+    }
 
   }
 

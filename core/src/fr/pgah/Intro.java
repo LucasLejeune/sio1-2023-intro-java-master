@@ -1,10 +1,13 @@
 package fr.pgah;
 
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Intro extends ApplicationAdapter {
@@ -25,6 +28,10 @@ public class Intro extends ApplicationAdapter {
   int[] aleatoire;
   int nbSprites;
   Texture perdu;
+  int vitesse;
+  Sprite bombsprite;
+  Rectangle player;
+  Rectangle bomb;
 
   // Définition de la méthode create
   // C'est là qu'on initialise toutes les variables (on leur donne une valeur).
@@ -43,15 +50,20 @@ public class Intro extends ApplicationAdapter {
     for (int i=0; i<nbSprites; i++){
       aleatoire[i] = (int) (Math.random() * 100) + 20;
     }
+
+    vitesse = 5;
     // Chaque élément du tableau est lui-même un objet (Texture)
     // Il faut donc instancier une Texture pour chaque élément
 
     // Accès au 1er élément (notation indexée[])
     // Les tableaux sont indexés à partir de 0
     // On instancie (new) une nouvelle texture à chaque fois
-    imgs[0] = new Texture("eddie.png");
+    imgs[0] = new Texture(Gdx.files.internal("eddie.png"));
+    player = new Rectangle ();
+    bomb = new Rectangle();
     for (int i=1; i<nbSprites; i++){
-      imgs[i] = new Texture("bomb.png");
+      imgs[i] = new Texture(Gdx.files.internal("bomb.png"));
+
     }
 
 
@@ -59,13 +71,13 @@ public class Intro extends ApplicationAdapter {
     // int n'est pas un type objet, pas besoin de "new" pour chaque élément
     coordonneesX = new int[nbSprites];
     for (int i=0; i<nbSprites; i++){
-      coordonneesX[i] = (int) (Math.random() * 100);
+      coordonneesX[i] = (int) (Math.random() * 100) + 20;
     }
 
     // Idem pour les Y
     coordonneesY = new int[nbSprites];
     for (int i=0; i<nbSprites; i++){
-      coordonneesY[i] = (int) (Math.random() * 100);
+      coordonneesY[i] = (int) (Math.random() * 100) + 20;
     }
 
     // Idem pour les hauteurs de chaque sprite
@@ -74,19 +86,30 @@ public class Intro extends ApplicationAdapter {
     // C'est sur une autre classe (Texture) donc il faut utiliser la notation
     // pointée.
     for (int i=0; i<nbSprites; i++){
-      hauteursImgs[i] = (int) (Math.random() * 100);
+      hauteursImgs[i] = imgs[i].getHeight();
     }
 
     // Les largeurs pour chaque objet
     largeursImgs = new int[nbSprites];
     for (int i=0; i<nbSprites; i++){
-      largeursImgs[i] = (int) (Math.random() * 100);
+      largeursImgs[i] = imgs[i].getWidth();
     }
+
+    player.width = largeursImgs[0];
+    player.height = hauteursImgs[0];
+    player.x = coordonneesX[0];
+    player.y = coordonneesY[0];
+    bomb.width = largeursImgs[1];
+    bomb.height = hauteursImgs[1];
+    bomb.x = coordonneesX[1];
+    bomb.y = coordonneesY[1];
 
     // Tableau indiquant, pour chaque sprite, s'il va vers le haut (case à vrai)
     // ou vers le bas (case à faux)
     versLeHaut = new boolean[nbSprites];
     tabBool = new boolean[2];
+    tabBool[0] = true;
+    tabBool[1] = false;
     for (int i=0; i<nbSprites; i++){
       versLeHaut[i] = tabBool[(int) (Math.random())];
     }
@@ -101,13 +124,15 @@ public class Intro extends ApplicationAdapter {
     // On demande à la bibliothèque la hauteur et la largeur de la fenêtre
     hauteurFenetre = Gdx.graphics.getHeight();
     largeurFenetre = Gdx.graphics.getWidth();
+ 
+    }
+
 
     // Quand une méthode est terminée (accolade fermante), Java retourne
     // dans le code appelant la méthode pour continuer l'exécution.
     // Ici comme "create" est appelé par la bibliothèque, c'est elle qui va
     // continuer l'exécution (elle va commencer à appeler "render")
 
-  }
 
   // Définition de la méthode render
   // Exécutée par la bibliothèque 60 fois par secondes (pour avoir un rendu
@@ -139,42 +164,23 @@ public class Intro extends ApplicationAdapter {
   }
 
   private void collision() {
-    for (int i = 1; i < nbSprites; i++) {
-      // Si le sprite tape en haut...
-      if (coordonneesY[0] == coordonneesY[i] + hauteursImgs[i]) {
-        batch.end();
-        
-      }
-
-      // Si le sprite tape en bas...
-      if (coordonneesY[0] + hauteursImgs[0] == coordonneesY[i]){
-        batch.end();
-      }
-
-      // Si le sprite tape à droite...
-      if (coordonneesX[0] == coordonneesX[i] + largeursImgs[i]) {
-        batch.end();
-      }
-
-      // Si le sprite tape à gauche...
-      if (coordonneesX[0] + largeursImgs[0] == coordonneesX[i]) {
-        batch.end();
-      }
+    if (player.overlaps(bomb)){
+      Gdx.app.log("overlaps", "yes");
     }
   }
 
   private void deplacement() {
-    if (Gdx.input.isKeyPressed(Keys.LEFT)){
-        coordonneesX[0] -=5;
+    if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.Q)){
+        coordonneesX[0] -=vitesse;
     }
-    else if (Gdx.input.isKeyPressed(Keys.RIGHT)){
-      coordonneesX[0] +=5;
+    else if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)){
+      coordonneesX[0] +=vitesse;
     }
-    else if (Gdx.input.isKeyPressed(Keys.UP)){
-      coordonneesY[0] +=5;
+    else if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.Z)){
+      coordonneesY[0] +=vitesse;
     }
-    else if (Gdx.input.isKeyPressed(Keys.DOWN)){
-      coordonneesY[0] -=5;
+    else if (Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)){
+      coordonneesY[0] -=vitesse;
     }
 
   }
@@ -196,8 +202,29 @@ public class Intro extends ApplicationAdapter {
   // les tableaux de direction si besoin
   public void testerBordures() {
 
+    if (coordonneesY[0] + hauteursImgs[0] >= hauteurFenetre) {
+      coordonneesY[0] -= 5;
+    }
+
+    // Si le sprite tape en bas...
+    if (coordonneesY[0] <= 0) {
+      // on retient qu'il doit maintenant aller vers le haut
+      coordonneesY[0] += 5;
+    }
+
+    // Si le sprite tape à droite...
+    if (coordonneesX[0] + largeursImgs[0] >= largeurFenetre) {
+      // on retient qu'il doit maintenant aller vers la gauche
+      coordonneesX[0] -= 5;
+    }
+
+    // Si le sprite tape à gauche...
+    if (coordonneesX[0] <= 0) {
+      // on retient qu'il doit maintenant aller vers la droite
+      coordonneesX[0] += 5;
+    }
     // Pour tous les indices i de 0 à 1, faire...
-    for (int i = 0; i < nbSprites; i++) {
+    for (int i = 1; i < nbSprites; i++) {
       // Si le sprite tape en haut...
       if (coordonneesY[i] + hauteursImgs[i] >= hauteurFenetre) {
         // on retient qu'il doit maintenant aller vers le bas

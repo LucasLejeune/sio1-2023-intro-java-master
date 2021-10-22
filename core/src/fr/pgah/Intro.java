@@ -42,9 +42,9 @@ public class Intro extends ApplicationAdapter {
 
     batch = new SpriteBatch(); // type objet => instanciation (new)
 
-    imgs = new Texture[30]; // tableau = type objet aussi ; ici : 2 Textures
-
     nbSprites = 2;
+
+    imgs = new Texture[nbSprites]; // tableau = type objet aussi ; ici : 2 Textures
 
     aleatoire = new int[nbSprites] ;
     for (int i=0; i<nbSprites; i++){
@@ -165,24 +165,32 @@ public class Intro extends ApplicationAdapter {
 
   private void collision() {
     if (player.overlaps(bomb)){
-      Gdx.app.log("overlaps", "yes");
-    }
+      coordonneesX[0] = 0;
+      coordonneesY[0] = 0;
+      player.x = 0;
+      player.y = 0;
+
+      Gdx.app.log("overlaps","yes");
+    } 
   }
 
   private void deplacement() {
     if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.Q)){
         coordonneesX[0] -=vitesse;
+        player.x = coordonneesX[0];
     }
     else if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)){
       coordonneesX[0] +=vitesse;
+      player.x = coordonneesX[0];
     }
     else if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.Z)){
       coordonneesY[0] +=vitesse;
+      player.y = coordonneesY[0];
     }
     else if (Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)){
       coordonneesY[0] -=vitesse;
+      player.y = coordonneesY[0];
     }
-
   }
 
   // Repeint l'arrière-plan
@@ -223,6 +231,7 @@ public class Intro extends ApplicationAdapter {
       // on retient qu'il doit maintenant aller vers la droite
       coordonneesX[0] += 5;
     }
+
     // Pour tous les indices i de 0 à 1, faire...
     for (int i = 1; i < nbSprites; i++) {
       // Si le sprite tape en haut...
@@ -270,9 +279,11 @@ public class Intro extends ApplicationAdapter {
       if (versLaDroite[i]) {
         // on augmente X
         coordonneesX[i] += aleatoire[i]; // incrémentation
+        bomb.x = coordonneesX[i];
       } else { // sinon
         // on diminue X (il va vers la gauche)
         coordonneesX[i] -= aleatoire[i]; // décrémentation
+        bomb.x = coordonneesX[i];
       }
     }
 
@@ -284,9 +295,11 @@ public class Intro extends ApplicationAdapter {
       if (versLeHaut[i]) {
         // on augmente Y
         coordonneesY[i] += aleatoire[i]; // incrémentation
+        bomb.y = coordonneesY[i];
       } else { // sinon
         // on dinminue Y (il va vers la gauche)
         coordonneesY[i] -= aleatoire[i]; // décrémentation
+        bomb.y = coordonneesY[i];
       }
     }
   }
